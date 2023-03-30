@@ -1,0 +1,6 @@
+<resources>
+    <style name="splash_layout">
+        <item name="android:background">@drawable/splash_image</item>
+    </style>
+
+</resources>
