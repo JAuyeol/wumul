@@ -1,7 +1,6 @@
 package com.example.wumul;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -15,7 +14,22 @@ public class SplashActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_layout);
+// 정규현
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        }, 2000); // 2초 대기 후 MainActivity로 이동
 
+    }
+}
+
+// 정금열
+/*
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
@@ -33,6 +47,4 @@ public class SplashActivity extends AppCompatActivity {
                 finish();
             }
         }, 2000); // 2초 대기 후 MainActivity로 이동
-
-    }
-}
+ */
