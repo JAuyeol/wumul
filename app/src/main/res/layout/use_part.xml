@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:orientation="vertical">
+
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="130dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/bookmark12"
+        android:text="물 사용량"
+        android:textColor="#ffffff" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="130dp"
+        android:layout_height="70dp"
+        android:background = "@drawable/bookmark12"
+        android:textColor="#ffffff"
+        android:text="세부 사용량" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="130dp"
+        android:layout_height="70dp"
+        android:background="@drawable/bookmark12"
+        android:text="구성원"
+        android:textColor="#ffffff" />
+
+    <Button
+        android:id="@+id/button4"
+        android:layout_width="130dp"
+        android:layout_height="70dp"
+        android:background = "@drawable/bookmark12"
+        android:textColor="#ffffff"
+        android:text="물 절약 TIP" />
+
+
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="300dp"
+        android:layout_height="127dp"
+        android:layout_gravity="right"
+        android:layout_marginTop="30dp"
+        android:drawableLeft="@drawable/sho1"
+        android:drawablePadding="10dp"
+        android:background="@drawable/button1_pattern"
+        android:elevation="10dp"
+        android:textStyle="bold"
+        android:text="샤워 하는 동안 250L 사용 했어요" />
+
+    <Button
+        android:id="@+id/button6"
+        android:layout_width="300dp"
+        android:layout_height="110dp"
+        android:layout_gravity="right"
+        android:background="@drawable/button2_pattern"
+        android:layout_marginRight="20dp"
+        android:drawableLeft="@drawable/s22"
+        android:drawablePadding="10dp"
+        android:textStyle="bold"
+        android:text="세면대 에서 100L 사용 했어요" />
+
+    <Button
+        android:id="@+id/button7"
+        android:layout_width="300dp"
+        android:layout_height="100dp"
+        android:layout_gravity="right"
+        android:layout_marginRight="60dp"
+        android:drawableLeft="@drawable/si33"
+        android:drawablePadding="10dp"
+        android:textStyle="bold"
+        android:background="@drawable/button_pattern"
+        android:text="주방 에서 300L 사용 했어요" />
+
+</LinearLayout>
