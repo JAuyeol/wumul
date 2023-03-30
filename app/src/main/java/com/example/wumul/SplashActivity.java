@@ -1,6 +1,7 @@
 package com.example.wumul;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 
@@ -19,7 +20,15 @@ public class SplashActivity extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                SharedPreferences sharedPreferences = getSharedPreferences("myPrefs", MODE_PRIVATE);
+                int familyCount = sharedPreferences.getInt("familyCount", -1);
+
+                Intent intent;
+                if (familyCount == -1) {
+                    intent = new Intent(SplashActivity.this, CountFamilyActivity.class);
+                } else {
+                    intent = new Intent(SplashActivity.this, MainActivity.class);
+                }
                 startActivity(intent);
                 finish();
             }
