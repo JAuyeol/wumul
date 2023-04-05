@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+        android:id="@+id/menu_wateruse"
+        android:title="물 사용량"
+        android:fontFamily="@font/cafe24surround"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/menu_detailuse"
+        android:title="세부 사용량"
+        android:fontFamily="@font/cafe24surround"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/menu_people"
+        android:title="구성원"
+        android:fontFamily="@font/cafe24surround"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/menu_tips"
+        android:title="절약 TIP"
+        android:fontFamily="@font/cafe24surround"
+        app:showAsAction="always"/>
+<!--         android:icon="@drawable/ic_bookmark"-->
+
+
+
+
+
+</menu>

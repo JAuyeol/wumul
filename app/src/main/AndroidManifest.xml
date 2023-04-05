@@ -35,6 +35,7 @@
         <!-- MainActivity 시작 -->
         <activity
             android:name=".MainActivity"
+            android:theme = "@style/Theme.AppCompat.Light.NoActionBar"
             android:exported="true">
         </activity>
         <!-- MainActivity 끝 -->

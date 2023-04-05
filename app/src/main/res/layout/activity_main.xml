@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout
+    android:id="@+id/drawer"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
 
+
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navigation"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start|left"
+        app:menu="@menu/menu_main" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -11,58 +23,9 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/button1"
-            android:layout_width="200dp"
-            android:layout_height="130dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="100dp"
-            android:background="@drawable/bookmark12"
-            android:fontFamily="@font/cafe24surround"
-            android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:text="물 사용량"
-            android:textColor="#ffffff"
-            android:textSize="25sp" />
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="200dp"
-            android:layout_height="130dp"
-            android:text="세부 사용량"
-            android:layout_marginLeft="10dp"
-            android:background="@drawable/bookmark12"
-            android:textColor="#ffffff"
-            android:textSize="20sp"
-            android:fontFamily="@font/cafe24surround"
-            android:foreground="?attr/selectableItemBackgroundBorderless"/>
-
-        <Button
-            android:id="@+id/button3"
-            android:layout_width="200dp"
-            android:layout_height="130dp"
-            android:layout_marginLeft="10dp"
-            android:background="@drawable/bookmark12"
-            android:text="구성원"
-            android:textColor="#ffffff"
-            android:textSize="25sp"
-            android:fontFamily="@font/cafe24surround"
-            android:foreground="?attr/selectableItemBackgroundBorderless"/>
-
-        <Button
-            android:id="@+id/button4"
-            android:layout_width="200dp"
-            android:layout_height="180dp"
-            android:text="물 절약 TIP"
-            android:layout_marginLeft="10dp"
-            android:background="@drawable/bookmark12"
-            android:textColor="#ffffff"
-            android:textSize="20sp"
-            android:fontFamily="@font/cafe24surround"
-            android:foreground="?attr/selectableItemBackgroundBorderless"/>
-
-
+        <include  layout="@layout/toolbar_main"
+            android:id ="@+id/toolbar"/>
     </LinearLayout>
-
 
     <LinearLayout
         android:layout_width="0dp"
@@ -104,5 +67,10 @@
 
     </LinearLayout>
 
-</LinearLayout>
+
+
+</androidx.drawerlayout.widget.DrawerLayout>
+
+
+
 
