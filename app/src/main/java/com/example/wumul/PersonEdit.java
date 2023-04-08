@@ -2,15 +2,23 @@ package com.example.wumul;
 
 import android.annotation.SuppressLint;
 import android.app.Person;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+import android.view.View.OnKeyListener;
+import android.view.View;
+import android.view.KeyEvent;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -54,6 +62,7 @@ public class PersonEdit extends AppCompatActivity {
                         EditText et = (EditText) editPerson.getChildAt(i);
                         String text = et.getText().toString();
                         Log.d("PersonEdit", "EditText " + i + ": " + text);
+
                     }
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP|Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -64,9 +73,20 @@ public class PersonEdit extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(),"EditText 박스 만들기 버튼을 눌러 박스를 만들어 주세요.",Toast.LENGTH_SHORT).show();
                 }
 
+
+
             }
         });
 
+    }
+
+    private boolean onKey(View v, int keyCode, KeyEvent event){
+        if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                (keyCode == KeyEvent.KEYCODE_ENTER)) {
+
+            return true;
+        }
+        return false;
     }
 
 }

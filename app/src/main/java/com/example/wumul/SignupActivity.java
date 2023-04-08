@@ -46,7 +46,7 @@ public class SignupActivity extends AppCompatActivity {
             switch(v.getId()){
                 case R.id.create_account_button:
                     signUp();
-                    Log.d(TAG,"버튼 클릭됨");
+                    Log.d(TAG,"회원가입 버튼 클릭됨");
                     break;
 
             }
@@ -56,25 +56,37 @@ public class SignupActivity extends AppCompatActivity {
     public void signUp(){
         String email = ((EditText)findViewById(R.id.create_user_ID)).getText().toString();
         String password = ((EditText)findViewById(R.id.create_user_PASSWARD)).getText().toString();
+        String checkpassword = ((EditText)findViewById(R.id.check_user_PASSWARD)).getText().toString();
 
-        mAuth.createUserWithEmailAndPassword(email, password)
-              .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                 @Override
-                 public void onComplete(@NonNull Task<AuthResult> task) {
-                     if (task.isSuccessful()) {
-                     // Sign in success, update UI with the signed-in user's information
-                         Log.d(TAG, "createUserWithEmail:success");
-                         FirebaseUser user = mAuth.getCurrentUser();
+        if(email.length()>0 && password.length()>0 && checkpassword.length()>0){
+            if(password.equals(checkpassword)) {
+
+                mAuth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    // Sign in success, update UI with the signed-in user's information
+                                    Log.d(TAG, "로그,,,로그인 성공");
+                                    Toast.makeText(SignupActivity.this, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                                    FirebaseUser user = mAuth.getCurrentUser();
 //                       updateUI(user);
-                          // 로그인 성공
-                     } else {
-                      // If sign in fails, display a message to the user.
-                         Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                                    // 로그인 성공
+                                } else {
+                                    // If sign in fails, display a message to the user.
+                                    Log.w(TAG, "로그,,,로그인 실패", task.getException());
+                                    Toast.makeText(SignupActivity.this, "회원가입에 실패하였습니다.", Toast.LENGTH_SHORT).show();
 
 //                       updateUI(null);
-                         // 실패했을 때
-                     }
-                 }
-             });
+                                    // 실패했을 때
+                                }
+                            }
+                        });
+            }else{
+                Toast.makeText(this, "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show();
+            }
+    }else{
+            Toast.makeText(this, "이메일 또는 비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show();
+        }
     }
 }

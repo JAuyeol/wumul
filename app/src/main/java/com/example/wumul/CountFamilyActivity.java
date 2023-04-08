@@ -2,8 +2,6 @@ package com.example.wumul;
 
 import static android.content.ContentValues.TAG;
 
-
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -29,8 +27,7 @@ public class CountFamilyActivity extends AppCompatActivity {
     private TextView family_count_text;
     private ImageButton plus_button, minus_button;
 
-
-    private int familyCount = 0;
+    int familyCount = 0;
 
 
     protected void onCreate(Bundle savedInstanceState){
@@ -42,9 +39,6 @@ public class CountFamilyActivity extends AppCompatActivity {
         family_count_text.setText(familyCount+"");
         plus_button = findViewById(R.id.plus_button);
         minus_button = findViewById(R.id.minus_button);
-
-
-
 
         plus_button.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -71,7 +65,6 @@ public class CountFamilyActivity extends AppCompatActivity {
 
     }
 
-
     public void onSaveFamilyCountClicked(View view){
         int familyCount = Integer.parseInt(family_count_text.getText().toString());
         Intent intent = new Intent(CountFamilyActivity.this,PersonEdit.class);
@@ -84,8 +77,6 @@ public class CountFamilyActivity extends AppCompatActivity {
 
         // CountFamilyActivity 종료
         //finish();
-
-
     }
 
 }

@@ -33,17 +33,17 @@
         android:gravity="end"
         android:padding="16dp">
 
-    <Button
-        android:id="@+id/confirm_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="확인"
-        android:layout_marginTop="500sp"
-        android:textSize="16sp"
-        android:backgroundTint="#87CEEB"
-        android:fontFamily="@font/cafe24surround"
-        android:textColor="@color/white"
-        />
+        <Button
+            android:id="@+id/confirm_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="확인"
+            android:layout_marginTop="500sp"
+            android:textSize="16sp"
+            android:backgroundTint="#87CEEB"
+            android:fontFamily="@font/cafe24surround"
+            android:textColor="@color/white"
+            />
 
     </LinearLayout>
     <LinearLayout
