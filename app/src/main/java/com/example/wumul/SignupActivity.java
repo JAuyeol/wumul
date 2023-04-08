@@ -44,8 +44,9 @@ public class SignupActivity extends AppCompatActivity {
         @Override
         public void onClick(View v){
             switch(v.getId()){
-                case R.id.signup_button:
+                case R.id.create_account_button:
                     signUp();
+                    Log.d(TAG,"버튼 클릭됨");
                     break;
 
             }

@@ -103,7 +103,7 @@ public class CountFamilyActivity extends AppCompatActivity {
 //            dialog.show();
 //        };
         // CountFamilyActivity 종료
-        //finish();
+//        finish();
     }
 
 }
