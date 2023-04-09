@@ -39,6 +39,12 @@
             android:exported="true">
         </activity>
         <!-- MainActivity 끝 -->
+
+        <activity
+            android:name=".PersonEdit"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:exported="true">
+        </activity>
     </application>
 
 </manifest>
