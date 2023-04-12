@@ -50,19 +50,18 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:exported="true">
         </activity>
-        <!-- MainActivity 시작 -->
+
+        <activity android:name=".PasswordResetActivity"
+            android:theme = "@style/Theme.AppCompat.Light.NoActionBar"
+            android:exported="true">
+        </activity>
+
         <activity
             android:name=".MainActivity"
             android:theme = "@style/Theme.AppCompat.Light.NoActionBar"
             android:exported="true">
         </activity>
-        <!-- MainActivity 끝 -->
 
-        <activity
-            android:name=".PersonEdit"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:exported="true">
-        </activity>
     </application>
 
 </manifest>

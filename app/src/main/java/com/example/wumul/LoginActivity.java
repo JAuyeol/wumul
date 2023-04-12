@@ -26,6 +26,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.login_layout);
         findViewById(R.id.login_button).setOnClickListener(onClickListener);
         findViewById(R.id.goto_signup).setOnClickListener(onClickListener);
+        findViewById(R.id.goto_passwordReset).setOnClickListener(onClickListener);
         mAuth = FirebaseAuth.getInstance();
 
     }
@@ -50,8 +51,11 @@ public class LoginActivity extends AppCompatActivity {
                     Login();
                     break;
                 case R.id.goto_signup:
-                    gotoSignupActivity();
+                    gotoActivity(SignupActivity.class);
                     Log.d(TAG, "버튼 클릭됨");
+                    break;
+                case R.id.goto_passwordReset:
+                    gotoActivity(PasswordResetActivity.class);
                     break;
 
             }
@@ -89,12 +93,23 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-    private void gotoSignupActivity(){
-        Intent intent = new Intent(this,SignupActivity.class);
+    private void gotoActivity(Class c){
+        Intent intent = new Intent(this,c);
+        intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
+
+//    private void gotoSignupActivity(){
+//        Intent intent = new Intent(this,SignupActivity.class);
+//        startActivity(intent);
+//    }
     private void gotoMainActivity(){
         Intent intent = new Intent(this,CountFamilyActivity.class);
         startActivity(intent);
+        // 카운트패밀리 설정한 경우 메인으로 바로 넘어갈 코드 추가해야함
     }
+//    private void gotoPasswordResetActivity(){
+//        Intent intent = new Intent(this,PasswordResetActivity.class);
+//        startActivity(intent);
+//    }
 }
