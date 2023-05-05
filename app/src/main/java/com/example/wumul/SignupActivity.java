@@ -1,5 +1,6 @@
 package com.example.wumul;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +20,7 @@ public class SignupActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private static final String TAG = "SignupActivity";
+
 
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -70,12 +72,13 @@ public class SignupActivity extends AppCompatActivity {
                                     Log.d(TAG, "로그,,,로그인 성공");
                                     Toast.makeText(SignupActivity.this, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
                                     FirebaseUser user = mAuth.getCurrentUser();
+                                    gotoActivity(LoginActivity.class);
 //                       updateUI(user);
                                     // 로그인 성공
                                 } else {
                                     // If sign in fails, display a message to the user.
                                     Log.w(TAG, "로그,,,로그인 실패", task.getException());
-                                    Toast.makeText(SignupActivity.this, "회원가입에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(SignupActivity.this, "회원가입에 실패하였습니다. 다른 이메일 주소를 입력해주세요.", Toast.LENGTH_SHORT).show();
 
 //                       updateUI(null);
                                     // 실패했을 때
@@ -88,5 +91,13 @@ public class SignupActivity extends AppCompatActivity {
     }else{
             Toast.makeText(this, "이메일 또는 비밀번호를 입력해주세요", Toast.LENGTH_SHORT).show();
         }
+    }
+
+
+
+    private void gotoActivity(Class c){
+        Intent intent = new Intent(this,c);
+        intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 }

@@ -1,6 +1,8 @@
 package com.example.wumul;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,14 +14,23 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private FirebaseAuth mAuth;
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private static final String TAG = "LoginActivity";
+
+
+    private DatabaseReference mDatabase;
+// ...
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
         findViewById(R.id.login_button).setOnClickListener(onClickListener);
         findViewById(R.id.goto_signup).setOnClickListener(onClickListener);
         findViewById(R.id.goto_passwordReset).setOnClickListener(onClickListener);
-        mAuth = FirebaseAuth.getInstance();
+
 
     }
 
@@ -77,7 +88,66 @@ public class LoginActivity extends AppCompatActivity {
                                 Log.d(TAG, "로그,,,로그인 성공");
                                 Toast.makeText(getApplicationContext(),"로그인에 성공했습니다.",Toast.LENGTH_SHORT).show();
                                 FirebaseUser user = mAuth.getCurrentUser();
-                                gotoMainActivity();
+                                if(user != null) {
+                                    String uid = user.getUid();
+                                    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                                    mDatabase.child("users").child(uid).child("family_members").addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            if (dataSnapshot.exists()) {
+                                                // Firebase Realtime Database에 데이터가 존재하는 경우
+                                                gotoActivity(MainActivity.class);
+                                                finish();
+                                            } else {
+                                                // Firebase Realtime Database에 데이터가 존재하지 않는 경우
+                                                gotoActivity(CountFamilyActivity.class);
+                                                finish();
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+
+                                        }
+                                    });
+                                } else {
+                                    gotoActivity(CountFamilyActivity.class);
+                                }
+                                /*mDatabase.child("users").child(uid).child("family_members").addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        if (dataSnapshot.exists()) {
+                                            // Firebase Realtime Database에 데이터가 존재하는 경우
+                                            gotoActivity(MainActivity.class);
+                                            finish();
+                                        } else {
+                                            // Firebase Realtime Database에 데이터가 존재하지 않는 경우
+                                            gotoActivity(CountFamilyActivity.class);
+                                            finish();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+
+                                    }
+                                });*/
+
+                                /*mDatabase.child("users").child("username").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                        if (!task.isSuccessful()) {
+                                            Log.e("firebase", "Error getting data", task.getException());
+                                            gotoActivity(CountFamilyActivity.class);
+                                        }
+                                        else {
+                                            Log.w("firebase","데이터 가져오기 성공");
+                                            gotoActivity(MainActivity.class);
+                                        }
+                                    }
+
+                                });*/
+
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "로그,,,로그인 실패", task.getException());
@@ -104,7 +174,7 @@ public class LoginActivity extends AppCompatActivity {
 //        startActivity(intent);
 //    }
     private void gotoMainActivity(){
-        Intent intent = new Intent(this,CountFamilyActivity.class);
+        Intent intent = new Intent(this,MainActivity.class);
         startActivity(intent);
         // 카운트패밀리 설정한 경우 메인으로 바로 넘어갈 코드 추가해야함
     }

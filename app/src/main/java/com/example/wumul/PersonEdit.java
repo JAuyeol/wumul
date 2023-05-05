@@ -22,12 +22,20 @@ import android.view.KeyEvent;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PersonEdit extends AppCompatActivity {
     private int familyCount;
     LinearLayout editPerson;
     private Button confirmButton;
+    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
     ArrayList<String> strList;
     //@SuppressLint("MissingInflatedId")
@@ -40,6 +48,7 @@ public class PersonEdit extends AppCompatActivity {
         confirmButton = findViewById(R.id.confirm_button);
         editPerson = findViewById(R.id.Person);
         Intent intent = getIntent();
+
 
         familyCount= intent.getIntExtra("familyCount",0);
 
@@ -62,7 +71,17 @@ public class PersonEdit extends AppCompatActivity {
                         EditText et = (EditText) editPerson.getChildAt(i);
                         String text = et.getText().toString();
                         Log.d("PersonEdit", "EditText " + i + ": " + text);
-
+//                        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();;
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            String uid = user.getUid();
+                            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                            Map<String, Object> data = new HashMap<>();
+                            data.put("name", text);
+                            mDatabase.child("users").child(uid).child("family_members").push().setValue(data);
+                            Log.w("Database", "정보 저장됨");
+                            Toast.makeText(getApplicationContext(), "저장을 완료했습니다.", Toast.LENGTH_SHORT).show();
+                        }
                     }
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP|Intent.FLAG_ACTIVITY_CLEAR_TOP);
