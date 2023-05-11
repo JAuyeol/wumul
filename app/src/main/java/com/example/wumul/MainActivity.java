@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout=findViewById(R.id.drawer);
         toolbar=findViewById(R.id.toolbar);
 
+        Button test_btn = findViewById(R.id.layout_test_button);
+
         //액션바 변경하기(들어갈 수 있는 타입 : Toolbar type
         setSupportActionBar(toolbar);
 
@@ -65,9 +67,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        test_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gotoActivity(TipActivity.class); // 테스트하려는 클래스 집어넣기
+            }
+        });
+
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    /*protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
         // CountFamilyActivity에서 넘어온 결과 처리
@@ -77,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-    }
+    }*/
 
     private void gotoActivity(Class c){
         Intent intent = new Intent(this,c);
