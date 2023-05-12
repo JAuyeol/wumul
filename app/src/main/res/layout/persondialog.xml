@@ -22,8 +22,6 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <include  layout="@layout/toolbar_main"
-            android:id ="@+id/toolbar"/>
     </LinearLayout>
 
     <LinearLayout

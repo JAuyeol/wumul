@@ -68,7 +68,6 @@ public class LoginActivity extends AppCompatActivity {
                 case R.id.goto_passwordReset:
                     gotoActivity(PasswordResetActivity.class);
                     break;
-
             }
         }
     };

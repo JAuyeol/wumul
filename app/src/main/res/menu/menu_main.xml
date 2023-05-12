@@ -4,31 +4,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
+    <group
+        android:checkableBehavior="single">
 
     <item
         android:id="@+id/menu_wateruse"
         android:title="물 사용량"
         android:fontFamily="@font/cafe24surround"
-        app:showAsAction="always"/>
+        android:icon="@drawable/waterdrop"/>
     <item
         android:id="@+id/menu_detailuse"
         android:title="세부 사용량"
         android:fontFamily="@font/cafe24surround"
-        app:showAsAction="always"/>
+        android:icon="@drawable/waterdrop"/>
     <item
         android:id="@+id/menu_people"
         android:title="구성원"
         android:fontFamily="@font/cafe24surround"
-        app:showAsAction="always"/>
+        android:icon="@drawable/waterdrop"/>
 
     <item
         android:id="@+id/menu_tips"
         android:title="절약 TIP"
         android:fontFamily="@font/cafe24surround"
-        app:showAsAction="always"/>
+        android:icon="@drawable/waterdrop"/>
 <!--         android:icon="@drawable/ic_bookmark"-->
 
+    </group>
 
+    <item
+        android:title="">
+
+        <menu>
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/nav_logout"
+                android:title="로그아웃"
+                android:fontFamily="@font/cafe24surround"/>
+        </menu>
+
+
+
+    </item>
 
 
 
