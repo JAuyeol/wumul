@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="80dp"
+    android:background="@drawable/button3_pattern"
+    android:orientation="horizontal"
+    android:layout_marginBottom="20dp"
+    android:layout_marginTop="20dp"
+    android:paddingStart ="16dp"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/family_member_icon_image_view"
+        android:layout_width="80dp"
+        android:layout_height="48dp"
+        android:src="@drawable/waterdrop_resize"
+
+        />
+
+    <TextView
+        android:id="@+id/family_member_name_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="25dp"/>
+
+</LinearLayout>

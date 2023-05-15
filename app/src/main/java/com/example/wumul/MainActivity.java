@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.menu_people:
                         // "구성원" 메뉴 선택 시 처리할 코드 작성
+                        gotoActivity(Testmb.class);
                         break;
                     case R.id.menu_tips:
                         gotoActivity(TipActivity.class);
