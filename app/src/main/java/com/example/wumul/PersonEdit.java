@@ -110,13 +110,4 @@ public class PersonEdit extends AppCompatActivity {
 
     }
 
-    private boolean onKey(View v, int keyCode, KeyEvent event){
-        if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-                (keyCode == KeyEvent.KEYCODE_ENTER)) {
-
-            return true;
-        }
-        return false;
-    }
-
 }

@@ -88,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
                         gotoActivity(TipActivity.class);
                         // "절약 TIP" 메뉴 선택 시 처리할 코드 작성
                         break;
+                    case R.id.check_use:
+                        gotoActivity(CheckUse.class);
+                        break;
                     case R.id.nav_logout:
                         FirebaseAuth.getInstance().signOut();
                         Toast.makeText(MainActivity.this, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();

@@ -28,6 +28,14 @@
         android:title="절약 TIP"
         android:fontFamily="@font/cafe24surround"
         android:icon="@drawable/waterdrop"/>
+
+
+        <item
+            android:id="@+id/check_use"
+            android:title="사용량 체크"
+            android:fontFamily="@font/cafe24surround"
+            android:icon="@drawable/waterdrop"/>
+
 <!--         android:icon="@drawable/ic_bookmark"-->
 
     </group>
