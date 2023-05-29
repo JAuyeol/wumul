@@ -67,18 +67,29 @@ public class PersonEdit extends AppCompatActivity {
             public void onClick(View v) {
                 if(familyCount>0)
                 {
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    String uid = user.getUid();
+                    DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                    Map<String, Object> data1 = new HashMap<>();
+                    data1.put("flag",0);
+                    data1.put("get_sink",0);
+                    data1.put("get_shower",0);
+                    mDatabase.child("users").child(uid).child("family_members").setValue(data1);
                     for(int i = 0; i < familyCount; i++) {
                         EditText et = (EditText) editPerson.getChildAt(i);
                         String text = et.getText().toString();
                         Log.d("PersonEdit", "EditText " + i + ": " + text);
 //                        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();;
-                        FirebaseUser user = mAuth.getCurrentUser();
+
                         if (user != null) {
-                            String uid = user.getUid();
-                            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+                            String pathString = text;
+
                             Map<String, Object> data = new HashMap<>();
-                            data.put("name", text);
-                            mDatabase.child("users").child(uid).child("family_members").push().setValue(data);
+                            data.put("sink",0);
+                            data.put("shower",0);
+                            data.put("sum",0);
+
+                            mDatabase.child("users").child(uid).child("family_members").child(pathString).setValue(data);
                             Log.w("Database", "정보 저장됨");
                             Toast.makeText(getApplicationContext(), "저장을 완료했습니다.", Toast.LENGTH_SHORT).show();
                         }

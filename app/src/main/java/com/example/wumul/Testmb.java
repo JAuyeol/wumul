@@ -33,7 +33,7 @@ public class Testmb extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             String uid = user.getUid();
-            mDatabase.child("users").child(uid).child("family_members").addValueEventListener(new ValueEventListener() {
+            mDatabase.child(uid).child("family_members").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     // 데이터베이스에서 가져온 데이터를 처리하는 코드
