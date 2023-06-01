@@ -1,5 +1,6 @@
 package com.example.wumul;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,14 +28,42 @@ public class CheckUse extends AppCompatActivity {
 
     private LinearLayout mFamilyMembersLayout;
     private DatabaseReference mDatabase;
+    private Button      btn_start, btn_stop, btn_reset;
+    private TextView    tv_info;
+    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+    private DatabaseReference DB_SINK = database.getReference().child("users").child("sink");
+    private DatabaseReference DB_HEAD = database.getReference().child("users").child("head");
+    private DatabaseReference DB_FLAG = database.getReference().child("users").child("flag");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.check_wateruse);
-
+        tv_info = (TextView)findViewById(R.id.id_info);
         mFamilyMembersLayout = findViewById(R.id.check_use_layout);
+
+
         mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
+        btn_start = (Button)findViewById(R.id.id_start);      btn_stop = (Button)findViewById(R.id.id_stop);        btn_reset = (Button)findViewById(R.id.id_reset);
+
+        btn_start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DB_FLAG.setValue(1);
+                tv_info.setText("측정시작");
+            }
+        });
+        btn_stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DB_FLAG.setValue(0);
+                tv_info.setText("측정종료");
+//                show_noti();
+            }
+        });
+
+
 
         // Firebase 데이터 변경 감지
         mDatabase.addValueEventListener(new ValueEventListener() {
@@ -113,6 +143,14 @@ public class CheckUse extends AppCompatActivity {
         sumText.setLayoutParams(layoutParams);
         sumText.setText(sumValue);
         itemLayout.addView(sumText);
+
+        Typeface typeface = ResourcesCompat.getFont(this, R.font.cafe24surround);
+        saveButton.setTypeface(typeface);
+        keyTextView.setTypeface(typeface);
+        sinkText.setTypeface(typeface);
+        showerText.setTypeface(typeface);
+        sumText.setTypeface(typeface);
+
 
 
         saveButton.setOnClickListener(new View.OnClickListener() {

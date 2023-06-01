@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.widget.Toolbar;
@@ -14,6 +15,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -35,6 +38,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthSettings;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.lang.reflect.Type;
 //import android.widget.Toolbar;
 
 
@@ -43,17 +53,23 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Main_Activity";
 
+    private DatabaseReference mDatabase;
+//  툴바, 네비게이션 start
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-
+//  툴바, 네비게이션 end
+    private FrameLayout frameLayout;
+    Long familyUsedSum= Long.valueOf(0);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.example_layout);
+        frameLayout = findViewById(R.id.frame_layout);
 
 
 
+//툴바, 네비게이션 바 관련 start
 
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
@@ -66,7 +82,65 @@ public class MainActivity extends AppCompatActivity {
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
+//툴바, 네비게이션 바 관련 end
+        mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
+        String key = getIntent().getStringExtra("key");
 
+
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user != null) {
+            String uid = user.getUid();
+            mDatabase.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+
+                    frameLayout.removeAllViews();
+                        for (DataSnapshot childSnapshot : snapshot.child(getUid()).child("family_members").getChildren()) {
+                            String key = childSnapshot.getKey();
+                            DataSnapshot data = childSnapshot;
+
+                            Long sumValue = data.child("sum").getValue(Long.class);
+
+                            if(sumValue !=null){
+                                familyUsedSum += sumValue;
+                            }
+
+                            }
+
+                    Typeface typeface = ResourcesCompat.getFont(MainActivity.this, R.font.cafe24surround);
+
+                    ImageView imageView = new ImageView(MainActivity.this);
+                    imageView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
+                    imageView.setImageResource(R.drawable.waterfamily_resize);
+                    imageView.setScaleType(ImageView.ScaleType.CENTER);
+                    FrameLayout.LayoutParams imageLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+                    imageLayoutParams.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+                    imageLayoutParams.topMargin = toolbar.getHeight(); // 툴바의 높이만큼 topMargin 설정
+                    imageView.setLayoutParams(imageLayoutParams);
+                    frameLayout.addView(imageView);
+
+
+
+                    TextView userSumTextView = new TextView(MainActivity.this);
+                    userSumTextView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
+                    userSumTextView.setText("우리 가족의 총 사용량 \n"+String.valueOf(familyUsedSum)+" L \n 사용했어요");
+                    userSumTextView.setTextSize(30);
+                    userSumTextView.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER);
+                    userSumTextView.setTypeface(typeface, Typeface.BOLD);
+                    FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
+                    layoutParams.gravity = Gravity.CENTER;
+                    userSumTextView.setLayoutParams(layoutParams);
+                    frameLayout.addView(userSumTextView);
+
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    // 처리 중 오류가 발생한 경우 여기에서 처리합니다.
+                }
+            });
+        }
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -82,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.menu_people:
                         // "구성원" 메뉴 선택 시 처리할 코드 작성
-                        gotoActivity(Testmb.class);
+                        gotoActivity(UsedFamily.class);
                         break;
                     case R.id.menu_tips:
                         gotoActivity(TipActivity.class);
@@ -111,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+        if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
@@ -119,10 +193,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
     private void gotoActivity(Class c){
         Intent intent = new Intent(this,c);
         intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+    }
+
+    private String getUid() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            return user.getUid();
+        }
+        return null;
     }
 
 }

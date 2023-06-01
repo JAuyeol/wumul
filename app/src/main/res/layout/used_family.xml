@@ -2,74 +2,43 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
+    android:orientation="vertical"
+    android:weightSum="10"
+    >
     <TextView
-        android:id="@+id/used_family1"
-        android:background="@drawable/button3_pattern"
-        android:layout_marginLeft="100dp"
-        android:drawableLeft="@drawable/waterdrop_resize"
-        android:layout_width="300dp"
-        android:layout_height="80dp"
-        android:layout_gravity="left"
-        android:gravity="center"
-        android:layout_marginTop="80dp"
-        android:fontFamily="@font/cafe24surround"
-        android:textSize="18dp"
-        android:text="가족 구성원 입력한 만큼 생성되게 해야하는데 ㅈ댔네" />
-
-    <TextView
-        android:id="@+id/used_family2"
-        android:background="@drawable/button3_pattern"
-        android:layout_marginLeft="100dp"
-        android:drawableLeft="@drawable/waterdrop_resize"
-        android:layout_width="300dp"
-        android:layout_height="80dp"
-        android:layout_gravity="left"
-        android:gravity="center"
-        android:layout_marginTop="30dp"
-        android:fontFamily="@font/cafe24surround"
-        android:textSize="18dp"
-        android:text="구성원2 물사용량 \n\n-L" />
-
-    <TextView
-        android:id="@+id/used_family3"
-        android:background="@drawable/button3_pattern"
-        android:layout_marginLeft="100dp"
-        android:drawableLeft="@drawable/waterdrop_resize"
-        android:layout_width="300dp"
-        android:layout_height="80dp"
-        android:layout_gravity="left"
-        android:gravity="center"
-        android:layout_marginTop="30dp"
-        android:fontFamily="@font/cafe24surround"
-        android:textSize="18dp"
-        android:text="구성원3 물사용량 \n\n-L" />
-
-    <TextView
-        android:id="@+id/used_shower"
-        android:background="@drawable/button3_pattern"
-        android:layout_marginLeft="100dp"
-        android:drawableLeft="@drawable/waterdrop_resize"
-        android:layout_width="300dp"
-        android:layout_height="80dp"
-        android:layout_gravity="left"
-        android:gravity="center"
-        android:layout_marginTop="30dp"
-        android:fontFamily="@font/cafe24surround"
-        android:textSize="18dp"
-        android:text="구성원4 물사용량 \n\n-L" />
-
-
-
-
-    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/water_back"
-        android:layout_gravity="end"
-        ></ImageView>
+        android:text="구성원별 사용량 확인"
+        android:textAlignment="center"
+        android:layout_gravity="center"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/cafe24surround"
+        android:layout_marginTop="50dp"
+        />
+
+        <LinearLayout
+            android:layout_marginTop="30dp"
+            android:id="@+id/family_use_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginLeft="50dp"
+                android:layout_weight="1"
+                android:text="Button"
+                android:textSize="20sp"
+                android:textAlignment="textStart"
+                android:fontFamily="@font/cafe24surround"
+                >
+
+            </Button>
 
 
-</LinearLayout>
+        </LinearLayout>
+    </LinearLayout>

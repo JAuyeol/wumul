@@ -5,6 +5,14 @@
     android:orientation="vertical">
 
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Key 님은 현재"
+        android:layout_gravity="center"
+        android:textSize="50dp"
+        android:layout_marginTop="30dp"/>
+
 
 
     <TextView
@@ -20,7 +28,7 @@
         android:layout_marginTop="80dp"
         android:fontFamily="@font/cafe24surround"
         android:textSize="20dp"
-        android:text="샤워기에서 -만큼 사용했어요" />
+        android:text="샤워기에서 --만큼 사용했어요" />
 
     <TextView
         android:id="@+id/used_washstand"
@@ -35,10 +43,10 @@
         android:layout_marginTop="15dp"
         android:fontFamily="@font/cafe24surround"
         android:textSize="20dp"
-        android:text="세면대에서 -만큼 사용했어요" />
+        android:text="세면대에서 --만큼 사용했어요" />
 
     <TextView
-        android:id="@+id/used_sink"
+        android:id="@+id/used_total"
         android:background="@drawable/button1_pattern"
         android:layout_marginLeft="20dp"
         android:drawableLeft="@drawable/sink_resize"
@@ -50,7 +58,7 @@
         android:layout_marginTop="15dp"
         android:fontFamily="@font/cafe24surround"
         android:textSize="20dp"
-        android:text="세면대에서 -만큼 사용했어요" />
+        android:text="총 --만큼 사용했어요" />
 
 
     <ImageView
