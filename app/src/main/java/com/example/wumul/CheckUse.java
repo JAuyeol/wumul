@@ -1,6 +1,10 @@
 package com.example.wumul;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,24 +33,36 @@ public class CheckUse extends AppCompatActivity {
 
     private LinearLayout mFamilyMembersLayout;
     private DatabaseReference mDatabase;
-    private Button      btn_start, btn_stop, btn_reset;
-    private TextView    tv_info;
+    private Button btn_start, btn_stop, btn_reset;
+    private TextView tv_info, tv_sink, tv_head;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private int get_sink = 0, get_head = 0;
+    private DatabaseReference DB_SINK, DB_HEAD, DB_FLAG;
 
-    private DatabaseReference DB_SINK = database.getReference().child("users").child("sink");
-    private DatabaseReference DB_HEAD = database.getReference().child("users").child("head");
-    private DatabaseReference DB_FLAG = database.getReference().child("users").child("flag");
+    private static String CHANNEL_ID = "channel1";
+    private static String CHANEL_NAME = "Channel1";
+    private NotificationManager manager;
+    private NotificationCompat.Builder builder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.check_wateruse);
-        tv_info = (TextView)findViewById(R.id.id_info);
+        tv_info = findViewById(R.id.id_info);
+        tv_sink = findViewById(R.id.id_sink);
+        tv_head = findViewById(R.id.id_head);
         mFamilyMembersLayout = findViewById(R.id.check_use_layout);
 
-
         mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
-        btn_start = (Button)findViewById(R.id.id_start);      btn_stop = (Button)findViewById(R.id.id_stop);        btn_reset = (Button)findViewById(R.id.id_reset);
+        btn_start = findViewById(R.id.id_start);
+        btn_stop = findViewById(R.id.id_stop);
+        btn_reset = findViewById(R.id.id_reset);
+
+        String uid = getUid();
+
+        DB_SINK = database.getReference("sink");
+        DB_HEAD = database.getReference("head");
+        DB_FLAG = database.getReference("flag");
 
         btn_start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,11 +76,43 @@ public class CheckUse extends AppCompatActivity {
             public void onClick(View view) {
                 DB_FLAG.setValue(0);
                 tv_info.setText("측정종료");
-//                show_noti();
+                show_noti();
             }
         });
 
+        ValueEventListener sinkValueListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.getValue() != null) {
+                    get_sink = Integer.parseInt(snapshot.getValue().toString());
+                    tv_sink.setText(snapshot.getValue().toString());
+                }
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        };
+        if (DB_SINK != null) {
+            DB_SINK.addValueEventListener(sinkValueListener);
+        }
+
+        ValueEventListener headValueListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.getValue() != null) {
+                    get_head = Integer.parseInt(snapshot.getValue().toString());
+                    tv_head.setText(snapshot.getValue().toString());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        };
+        if (DB_HEAD != null) {
+            DB_HEAD.addValueEventListener(headValueListener);
+        }
 
         // Firebase 데이터 변경 감지
         mDatabase.addValueEventListener(new ValueEventListener() {
@@ -89,6 +138,15 @@ public class CheckUse extends AppCompatActivity {
                         // 레이아웃 생성
                         LinearLayout itemLayout = createItemLayout(key, sinkStrValue, showerStrValue, sumStrValue);
                         mFamilyMembersLayout.addView(itemLayout);
+
+                        // sinkValue와 showerValue를 업데이트
+                        if (key.equals("sink")) {
+                            get_sink = sinkValue.intValue();
+                            tv_sink.setText(sinkStrValue);
+                        } else if (key.equals("shower")) {
+                            get_head = showerValue.intValue();
+                            tv_head.setText(showerStrValue);
+                        }
                     }
                 }
             }
@@ -118,7 +176,6 @@ public class CheckUse extends AppCompatActivity {
         itemLayout.setLayoutParams(layoutParams);
         itemLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-
         Button saveButton = new Button(this);
         saveButton.setLayoutParams(layoutParams);
         saveButton.setText("Save");
@@ -129,15 +186,16 @@ public class CheckUse extends AppCompatActivity {
         keyTextView.setText(key);
         itemLayout.addView(keyTextView);
 
+        TextView showerText = new TextView(this);
+        showerText.setLayoutParams(layoutParams);
+        showerText.setText(showerValue);
+        itemLayout.addView(showerText);
+
         TextView sinkText = new TextView(this);
         sinkText.setLayoutParams(layoutParams);
         sinkText.setText(sinkValue);
         itemLayout.addView(sinkText);
 
-        TextView showerText = new TextView(this);
-        showerText.setLayoutParams(layoutParams);
-        showerText.setText(showerValue);
-        itemLayout.addView(showerText);
 
         TextView sumText = new TextView(this);
         sumText.setLayoutParams(layoutParams);
@@ -151,21 +209,22 @@ public class CheckUse extends AppCompatActivity {
         showerText.setTypeface(typeface);
         sumText.setTypeface(typeface);
 
-
+        final Long sinkValueLong = Long.parseLong(sinkValue);
+        final Long showerValueLong = Long.parseLong(showerValue);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String updatedSinkValue = sinkText.getText().toString();
-                String updatedShowerValue = showerText.getText().toString();
-                String updatedSumValue = sumText.getText().toString();
+                String updatedSinkValue = tv_sink.getText().toString();
+                String updatedShowerValue = tv_head.getText().toString();
 
                 // Firebase에 데이터 업데이트
-                mDatabase.child(getUid()).child("family_members").child(key).child("sink").setValue(Long.parseLong(updatedSinkValue));
-                mDatabase.child(getUid()).child("family_members").child(key).child("shower").setValue(Long.parseLong(updatedShowerValue));
-                mDatabase.child(getUid()).child("family_members").child(key).child("sum").setValue(Long.parseLong(updatedSumValue));
+                mDatabase.child(getUid()).child("family_members").child(key).child("sink").setValue(Long.parseLong(updatedSinkValue) + sinkValueLong);
+                mDatabase.child(getUid()).child("family_members").child(key).child("shower").setValue(Long.parseLong(updatedShowerValue) + showerValueLong);
+                DB_SINK.setValue(0);
+                DB_HEAD.setValue(0);
 
-                Log.d("저장버튼","저장버튼 클릭");
+                Log.d("저장버튼", "저장버튼 클릭");
             }
         });
         itemLayout.addView(saveButton);
@@ -173,4 +232,26 @@ public class CheckUse extends AppCompatActivity {
         return itemLayout;
     }
 
+
+    public void show_noti(){
+        builder = null;
+        manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            manager.createNotificationChannel(
+                    new NotificationChannel(CHANNEL_ID, CHANEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
+            );
+
+            builder = new NotificationCompat.Builder(this,CHANNEL_ID);
+
+            //하위 버전일 경우
+        }else{
+            builder = new NotificationCompat.Builder(this);
+        }
+
+        builder.setContentTitle("물사용량 알림");
+        builder.setContentText("구성원에게 물사용량을 저장해주세요.");
+        builder.setSmallIcon(R.mipmap.ic_launcher);
+        Notification notification = builder.build();
+        manager.notify(1, notification);
+    }
 }
