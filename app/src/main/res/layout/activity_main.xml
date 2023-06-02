@@ -36,6 +36,21 @@
 
 
             <!-- 기타 뷰들 -->
+            <me.itangqi.waveloadingview.WaveLoadingView
+                android:id="@+id/waveLoadingView"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="450dp"
+                app:wlv_borderColor="#B8DFF8"
+                app:wlv_borderWidth="3dp"
+
+                app:wlv_shapeType="circle"
+                app:wlv_round_rectangle="true"
+                app:wlv_triangle_direction="north"
+                app:wlv_waveAmplitude="30"
+                app:wlv_waveColor="#00B9FF"/>
+
 
         </FrameLayout>
     </LinearLayout>
@@ -47,7 +62,7 @@
         android:layout_gravity="start"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/menu_main"
-        app:itemIconTint="#B8DFF8"
+        app:itemIconTint="#0080FF"
         app:itemTextColor="@color/black"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>

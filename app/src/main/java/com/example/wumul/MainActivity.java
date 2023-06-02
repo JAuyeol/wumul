@@ -45,6 +45,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.lang.reflect.Type;
+
+import me.itangqi.waveloadingview.WaveLoadingView;
 //import android.widget.Toolbar;
 
 
@@ -52,12 +54,13 @@ import java.lang.reflect.Type;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Main_Activity";
-
+    private static final int MAX_CAPACITY = 110;
+    WaveLoadingView waveLoadingView;
     private DatabaseReference mDatabase;
-//  툴바, 네비게이션 start
+    //  툴바, 네비게이션 start
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-//  툴바, 네비게이션 end
+    //  툴바, 네비게이션 end
     private FrameLayout frameLayout;
     Long familyUsedSum= Long.valueOf(0);
 
@@ -66,6 +69,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         frameLayout = findViewById(R.id.frame_layout);
+
+        waveLoadingView = findViewById(R.id.waveLoadingView);
+        waveLoadingView.setAnimDuration(3000);
+
 
 
 
@@ -95,21 +102,46 @@ public class MainActivity extends AppCompatActivity {
             mDatabase.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
-
-                    frameLayout.removeAllViews();
-                        for (DataSnapshot childSnapshot : snapshot.child(getUid()).child("family_members").getChildren()) {
-                            String key = childSnapshot.getKey();
-                            DataSnapshot data = childSnapshot;
-
-                            Long sumValue = data.child("sum").getValue(Long.class);
-
-                            if(sumValue !=null){
-                                familyUsedSum += sumValue;
-                            }
-
-                            }
-
                     Typeface typeface = ResourcesCompat.getFont(MainActivity.this, R.font.cafe24surround);
+
+                    long familyMembersCount = snapshot.child(getUid()).child("family_members").getChildrenCount();
+                    long totalCapacity = familyMembersCount * MAX_CAPACITY;
+                    long totalUsage = 0;
+//                    frameLayout.removeAllViews();
+                    for (DataSnapshot childSnapshot : snapshot.child(getUid()).child("family_members").getChildren()) {
+                        String key = childSnapshot.getKey();
+                        DataSnapshot data = childSnapshot;
+
+                        Long showerValue = data.child("shower").getValue(Long.class);
+                        Long sinkValue = data.child("sink").getValue(Long.class);
+                        Long sumValue = data.child("sum").getValue(Long.class);
+
+                        if (showerValue != null) {
+                            totalUsage += showerValue*0.001;
+                        }
+
+                        if (sinkValue != null) {
+                            totalUsage += sinkValue*0.001;
+                        }
+
+
+                        if(sumValue !=null){
+                            familyUsedSum += sumValue;
+                        }
+
+                    }
+                    int percent = (int) ((totalUsage / (double) totalCapacity) * 100);
+                    waveLoadingView.setProgressValue(percent);
+                    waveLoadingView.setCenterTitle(percent+"%");
+
+                    // waveLoadingView의 애니메이션 시작 위치 설정
+                    if (percent >= 1) {
+                        //int startAngle = (int) (360 * (percent / 100.0));
+                        waveLoadingView.startAnimation();
+                    }
+
+
+
 
                     ImageView imageView = new ImageView(MainActivity.this);
                     imageView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
@@ -125,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
 
                     TextView userSumTextView = new TextView(MainActivity.this);
                     userSumTextView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
-                    userSumTextView.setText("우리 가족의 총 사용량 \n"+String.valueOf(familyUsedSum)+" L");
+                    userSumTextView.setText("우리 가족의 총 사용량 \n"+String.valueOf(familyUsedSum)+" L \n 사용했어요");
                     userSumTextView.setTextSize(30);
                     userSumTextView.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER);
                     userSumTextView.setTypeface(typeface, Typeface.BOLD);
@@ -209,4 +241,3 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
-
