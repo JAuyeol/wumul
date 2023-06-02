@@ -41,10 +41,15 @@
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="450dp"
+                android:layout_marginTop="340dp"
                 app:wlv_borderColor="#B8DFF8"
                 app:wlv_borderWidth="3dp"
 
+
+                app:wlv_titleCenterStrokeColor="@android:color/holo_blue_dark"
+                app:wlv_titleCenterStrokeWidth="6dp"
+                app:wlv_titleCenterColor="@android:color/white"
+                app:wlv_titleCenterSize="24dp"
                 app:wlv_shapeType="circle"
                 app:wlv_round_rectangle="true"
                 app:wlv_triangle_direction="north"

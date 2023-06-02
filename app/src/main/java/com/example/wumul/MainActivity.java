@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -15,6 +16,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -138,6 +140,23 @@ public class MainActivity extends AppCompatActivity {
                     if (percent >= 1) {
                         //int startAngle = (int) (360 * (percent / 100.0));
                         waveLoadingView.startAnimation();
+
+                        if (percent > 100) {
+                            int excessPercent = percent - 100;
+
+                            int centerTitleStrokeColor = ContextCompat.getColor(MainActivity.this, android.R.color.holo_red_dark);
+                            int centerTitleColor = ContextCompat.getColor(MainActivity.this, android.R.color.white);
+                            waveLoadingView.setCenterTitleStrokeColor(centerTitleStrokeColor);
+                            waveLoadingView.setCenterTitleSize(centerTitleColor);
+                            int redColor = Color.parseColor("#FF6E6E"); // #FF6E6E 색상으로 설정
+                            waveLoadingView.setWaveColor(redColor);
+
+                            waveLoadingView.setBorderColor(Color.parseColor("#FF4646"));
+
+                            waveLoadingView.setCenterTitle("100%");
+                            waveLoadingView.setProgressValue(excessPercent);
+                            waveLoadingView.setCenterTitle(excessPercent + "% 초과");
+                        }
                     }
 
 
@@ -157,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
                     TextView userSumTextView = new TextView(MainActivity.this);
                     userSumTextView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
-                    userSumTextView.setText("우리 가족의 총 사용량 \n"+String.valueOf(familyUsedSum)+" L \n 사용했어요");
+                    userSumTextView.setText("우리 가족의 총 사용량 \n"+String.valueOf(familyUsedSum)+" L");
                     userSumTextView.setTextSize(30);
                     userSumTextView.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER);
                     userSumTextView.setTypeface(typeface, Typeface.BOLD);
