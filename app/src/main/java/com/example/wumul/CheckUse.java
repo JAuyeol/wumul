@@ -3,9 +3,11 @@ package com.example.wumul;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -77,6 +80,14 @@ public class CheckUse extends AppCompatActivity {
                 DB_FLAG.setValue(0);
                 tv_info.setText("측정종료");
                 show_noti();
+                gotoActivity(MainActivity.class);
+            }
+        });
+        btn_reset.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                DB_SINK.setValue(0);
+                DB_HEAD.setValue(0);
             }
         });
 
@@ -128,9 +139,10 @@ public class CheckUse extends AppCompatActivity {
 
                     Long sinkValue = data.child("sink").getValue(Long.class);
                     Long showerValue = data.child("shower").getValue(Long.class);
-                    Long sumValue = data.child("sum").getValue(Long.class);
 
-                    if (sinkValue != null && showerValue != null && sumValue != null) {
+                    if (sinkValue != null && showerValue != null) {
+                        Long sumValue = sinkValue + showerValue;  // sumValue 계산
+
                         String sinkStrValue = String.valueOf(sinkValue);
                         String showerStrValue = String.valueOf(showerValue);
                         String sumStrValue = String.valueOf(sumValue);
@@ -196,7 +208,6 @@ public class CheckUse extends AppCompatActivity {
         sinkText.setText(sinkValue);
         itemLayout.addView(sinkText);
 
-
         TextView sumText = new TextView(this);
         sumText.setLayoutParams(layoutParams);
         sumText.setText(sumValue);
@@ -209,8 +220,9 @@ public class CheckUse extends AppCompatActivity {
         showerText.setTypeface(typeface);
         sumText.setTypeface(typeface);
 
-        final Long sinkValueLong = Long.parseLong(sinkValue);
-        final Long showerValueLong = Long.parseLong(showerValue);
+        // sinkValue와 showerValue를 업데이트
+        Long sinkValueLong = Long.parseLong(sinkValue);  // sinkValueLong 변수 초기화
+        Long showerValueLong = Long.parseLong(showerValue);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -219,39 +231,63 @@ public class CheckUse extends AppCompatActivity {
                 String updatedShowerValue = tv_head.getText().toString();
 
                 // Firebase에 데이터 업데이트
-                mDatabase.child(getUid()).child("family_members").child(key).child("sink").setValue(Long.parseLong(updatedSinkValue) + sinkValueLong);
-                mDatabase.child(getUid()).child("family_members").child(key).child("shower").setValue(Long.parseLong(updatedShowerValue) + showerValueLong);
-                DB_SINK.setValue(0);
-                DB_HEAD.setValue(0);
+                Long updatedSinkValueLong = Long.parseLong(updatedSinkValue);
+                Long updatedShowerValueLong = Long.parseLong(updatedShowerValue);
 
-                Log.d("저장버튼", "저장버튼 클릭");
+                Long sinkValueLongUpdated = updatedSinkValueLong + sinkValueLong;
+                Long showerValueLongUpdated = updatedShowerValueLong + showerValueLong;
+
+                mDatabase.child(getUid()).child("family_members").child(key).child("sink").setValue(sinkValueLongUpdated);
+                mDatabase.child(getUid()).child("family_members").child(key).child("shower").setValue(showerValueLongUpdated);
+                mDatabase.child(getUid()).child("family_members").child(key).child("sum").setValue(sinkValueLongUpdated + showerValueLongUpdated);
+
+                DB_HEAD.setValue(0);
+                DB_SINK.setValue(0);
             }
         });
+
+
+
         itemLayout.addView(saveButton);
 
         return itemLayout;
     }
 
+    private void show_noti() {
+        // 알림 권한 확인
+        boolean notificationGranted = NotificationManagerCompat.from(this).areNotificationsEnabled();
+        if (!notificationGranted) {
+            // 알림 권한이 없는 경우, 권한 요청
+            Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+            intent.putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName());
+            startActivity(intent);
+            return;
+        }
 
-    public void show_noti(){
         builder = null;
-        manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+        manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             manager.createNotificationChannel(
                     new NotificationChannel(CHANNEL_ID, CHANEL_NAME, NotificationManager.IMPORTANCE_DEFAULT)
             );
 
-            builder = new NotificationCompat.Builder(this,CHANNEL_ID);
-
-            //하위 버전일 경우
-        }else{
+            builder = new NotificationCompat.Builder(this, CHANNEL_ID);
+        } else {
             builder = new NotificationCompat.Builder(this);
         }
 
-        builder.setContentTitle("물사용량 알림");
-        builder.setContentText("구성원에게 물사용량을 저장해주세요.");
-        builder.setSmallIcon(R.mipmap.ic_launcher);
+        builder.setContentTitle("물사용량 알림")
+                .setContentText("구성원에게 물사용량을 저장해주세요.")
+                .setSmallIcon(R.mipmap.ic_launcher);
+
         Notification notification = builder.build();
         manager.notify(1, notification);
     }
+    private void gotoActivity(Class c){
+        Intent intent = new Intent(this,c);
+        intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
+
 }

@@ -3,7 +3,6 @@ package com.example.wumul;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -31,10 +30,8 @@ public class UserInfoActivity extends AppCompatActivity {
         parentLayout = findViewById(R.id.parent_layout);
         mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
 
-        // 넘겨받은 key 변수 값
         String key = getIntent().getStringExtra("key");
 
-        // Firebase에서 데이터 읽어오기
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             String uid = user.getUid();
@@ -42,68 +39,76 @@ public class UserInfoActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
-                        // sink value, shower value, sum value 가져오기
                         Long sinkValue = dataSnapshot.child("sink").getValue(Long.class);
                         Long showerValue = dataSnapshot.child("shower").getValue(Long.class);
-                        Long sumValue = dataSnapshot.child("sum").getValue(Long.class);
+
+                        if (sinkValue == null || showerValue == null) {
+                            // sinkValue 또는 showerValue가 null인 경우 처리할 내용
+                            return;
+                        }
+
+                        double sumValue = sinkValue + showerValue;
+
+                        // mL을 L로 변환하여 소수점 자리수 설정
+                        double sumValueInLiters = sumValue / 1000.0;
+                        String formattedValue;
+                        if (sumValueInLiters >= 10) {
+                            formattedValue = String.format("%4.1f", sumValueInLiters);  // 소수점 한 자리까지 포맷팅
+                        } else {
+                            formattedValue = String.format("%4.3f", sumValueInLiters);  // 소수점 세 자리까지 포맷팅
+                        }
 
                         Typeface typeface = ResourcesCompat.getFont(UserInfoActivity.this, R.font.cafe24surround);
 
-
-// 첫 번째 TextView
-                        // 첫 번째 TextView
                         TextView keyTextView = new TextView(UserInfoActivity.this);
                         LinearLayout.LayoutParams keyTextViewParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                        keyTextViewParams.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL; // 화면 상단에 위치
+                        keyTextViewParams.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
                         keyTextView.setLayoutParams(keyTextViewParams);
                         keyTextView.setText(key + " 님은 현재");
                         keyTextView.setTextSize(40);
                         keyTextView.setTypeface(typeface);
                         parentLayout.addView(keyTextView);
 
-// 두 번째 TextView
                         TextView usedShowerTextView = new TextView(UserInfoActivity.this);
                         LinearLayout.LayoutParams usedShowerTextViewParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                        usedShowerTextViewParams.setMargins(150, 50, 50, 0); // 첫 번째 TextView와 50dp 간격 추가
+                        usedShowerTextViewParams.setMargins(150, 50, 50, 0);
                         usedShowerTextView.setLayoutParams(usedShowerTextViewParams);
                         usedShowerTextView.setBackgroundResource(R.drawable.button2_pattern);
                         usedShowerTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.shower_resize, 0, 0, 0);
                         usedShowerTextView.setCompoundDrawablePadding(30);
-                        usedShowerTextView.setText("샤워기에서 \n" + showerValue + " L 만큼 사용했어요");
+                        usedShowerTextView.setText("샤워기에서 \n" + String.format("%.3f", showerValue / 1000.0).replaceAll("0*$", "").replaceAll("\\.$", "") + " L 만큼 사용했어요");
                         usedShowerTextView.setTextSize(20);
                         usedShowerTextView.setGravity(Gravity.CENTER);
                         usedShowerTextView.setTypeface(typeface);
                         parentLayout.addView(usedShowerTextView);
 
-// 세 번째 TextView
                         TextView usedWashstandTextView = new TextView(UserInfoActivity.this);
                         LinearLayout.LayoutParams usedWashstandTextViewParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                        usedWashstandTextViewParams.setMargins(100, 50, 100, 0); // 첫 번째 TextView와 50dp 간격 추가
+                        usedWashstandTextViewParams.setMargins(100, 50, 100, 0);
                         usedWashstandTextView.setLayoutParams(usedWashstandTextViewParams);
                         usedWashstandTextView.setBackgroundResource(R.drawable.button_pattern);
                         usedWashstandTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.washstand_resize, 0, 0, 0);
                         usedWashstandTextView.setCompoundDrawablePadding(30);
-                        usedWashstandTextView.setText("세면대에서 \n" + sinkValue + " L 만큼 사용했어요");
+                        usedWashstandTextView.setText("세면대에서 \n" + String.format("%.3f", sinkValue / 1000.0).replaceAll("0*$", "").replaceAll("\\.$", "") + " L 만큼 사용했어요");
                         usedWashstandTextView.setTextSize(20);
                         usedWashstandTextView.setGravity(Gravity.CENTER);
                         usedWashstandTextView.setTypeface(typeface);
                         parentLayout.addView(usedWashstandTextView);
 
-// 네 번째 TextView
+
+
                         TextView usedTotalTextView = new TextView(UserInfoActivity.this);
                         LinearLayout.LayoutParams usedTotalTextViewParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                        usedTotalTextViewParams.setMargins(50, 50, 150, 0); // 첫 번째 TextView와 50dp 간격 추가
+                        usedTotalTextViewParams.setMargins(50, 50, 150, 0);
                         usedTotalTextView.setLayoutParams(usedTotalTextViewParams);
                         usedTotalTextView.setBackgroundResource(R.drawable.button1_pattern);
                         usedTotalTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.waterdrop_resize, 0, 0, 0);
                         usedTotalTextView.setCompoundDrawablePadding(30);
-                        usedTotalTextView.setText("총 " + sumValue + " L 만큼 사용했어요");
+                        usedTotalTextView.setText("총 사용량: " + formattedValue + " L");
                         usedTotalTextView.setTextSize(20);
                         usedTotalTextView.setGravity(Gravity.CENTER);
                         usedTotalTextView.setTypeface(typeface);
                         parentLayout.addView(usedTotalTextView);
-
-
                     }
                 }
 

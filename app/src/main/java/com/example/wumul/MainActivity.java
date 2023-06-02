@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.example_layout);
+        setContentView(R.layout.activity_main);
         frameLayout = findViewById(R.id.frame_layout);
 
 
@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
 
                     TextView userSumTextView = new TextView(MainActivity.this);
                     userSumTextView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
-                    userSumTextView.setText("우리 가족의 총 사용량 \n"+String.valueOf(familyUsedSum)+" L \n 사용했어요");
+                    userSumTextView.setText("우리 가족의 총 사용량 \n"+String.valueOf(familyUsedSum)+" L");
                     userSumTextView.setTextSize(30);
                     userSumTextView.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER);
                     userSumTextView.setTypeface(typeface, Typeface.BOLD);

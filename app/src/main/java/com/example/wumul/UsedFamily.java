@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -46,8 +47,9 @@ public class UsedFamily extends AppCompatActivity {
                 for (DataSnapshot childSnapshot : familyMembersSnapshot.getChildren()) {
                     String key = childSnapshot.getKey();
 
+
                     if (!key.equals("flag") && !key.equals("get_shower") && !key.equals("get_sink")) {
-                        LinearLayout buttonLayout = createItemLayout(key);
+                        LinearLayout buttonLayout = createItemLayout(key, childSnapshot);
                         mFamilyMembersLayout.addView(buttonLayout);
                     }
                 }
@@ -69,9 +71,11 @@ public class UsedFamily extends AppCompatActivity {
         return null;
     }
 
-    private LinearLayout createItemLayout(String key){
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.weight=1;
+    private LinearLayout createItemLayout(String key, DataSnapshot dataSnapshot) {
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.weight = 1;
 
         LinearLayout itemLayout = new LinearLayout(this);
         itemLayout.setLayoutParams(layoutParams);
@@ -79,13 +83,44 @@ public class UsedFamily extends AppCompatActivity {
 
         Button familyButton = new Button(this);
         familyButton.setLayoutParams(layoutParams);
-        familyButton.setText(key);
-        familyButton.setBackgroundResource(R.drawable.button3_pattern); // 버튼 배경 이미지 적용
-        familyButton.setTextColor(getResources().getColor(R.color.white)); // 버튼 텍스트 색상 설정
-        familyButton.setTextSize(getResources().getDimension(R.dimen.button_text_size)); // 버튼 텍스트 크기 설정
-
+        familyButton.setBackgroundResource(R.drawable.button3_pattern);
+        familyButton.setTextColor(getResources().getColor(R.color.white));
+        familyButton.setTextSize(getResources().getDimension(R.dimen.button_text_size_small)); // 작은 텍스트 크기 설정
         Typeface typeface = ResourcesCompat.getFont(this, R.font.cafe24surround);
         familyButton.setTypeface(typeface);
+
+        // Firebase에서 데이터 가져오기
+        DataSnapshot sinkSnapshot = dataSnapshot.child("sink");
+        DataSnapshot showerSnapshot = dataSnapshot.child("shower");
+        if (sinkSnapshot.exists() && showerSnapshot.exists()) {
+            Long sinkValue = sinkSnapshot.getValue(Long.class);
+            Long showerValue = showerSnapshot.getValue(Long.class);
+            if (sinkValue != null && showerValue != null) {
+                Long sumValue = sinkValue + showerValue;
+
+                // 버튼 텍스트 설정
+                String buttonText;
+                if (sumValue < 1000) {
+                    buttonText = key + "\n총 사용량: " + sumValue + " mL";
+                } else {
+                    double sumValueInLiters = (double) sumValue / 1000.0;  // mL을 L로 변환
+                    String formattedValue;
+                    if (sumValueInLiters >= 10) {
+                        formattedValue = String.format("%4.1f", sumValueInLiters);  // 소수점 한 자리까지 포맷팅
+                    } else {
+                        formattedValue = String.format("%4.3f", sumValueInLiters);  // 소수점 세 자리까지 포맷팅
+                    }
+                    buttonText = key + "\n총 사용량: " + formattedValue + " L";
+                }
+
+                familyButton.setText(buttonText);
+            }
+        } else {
+            // 데이터가 없는 경우 처리
+            familyButton.setText(key);
+        }
+
+        itemLayout.addView(familyButton);
 
         familyButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,9 +132,10 @@ public class UsedFamily extends AppCompatActivity {
             }
         });
 
-        itemLayout.addView(familyButton);
-
         return itemLayout;
     }
+
+
+
 
 }
