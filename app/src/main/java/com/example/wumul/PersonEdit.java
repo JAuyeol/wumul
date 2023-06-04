@@ -72,9 +72,9 @@ public class PersonEdit extends AppCompatActivity {
                     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
                     Map<String, Object> data1 = new HashMap<>();
                     data1.put("flag",0);
-                    data1.put("get_sink",0);
-                    data1.put("get_shower",0);
-                    mDatabase.child("users").child(uid).child("family_members").setValue(data1);
+                    data1.put("head",0);
+                    data1.put("sink",0);
+                    mDatabase.setValue(data1);
                     for(int i = 0; i < familyCount; i++) {
                         EditText et = (EditText) editPerson.getChildAt(i);
                         String text = et.getText().toString();

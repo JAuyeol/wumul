@@ -49,9 +49,6 @@ import com.google.firebase.database.ValueEventListener;
 import java.lang.reflect.Type;
 
 import me.itangqi.waveloadingview.WaveLoadingView;
-//import android.widget.Toolbar;
-
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,12 +56,10 @@ public class MainActivity extends AppCompatActivity {
     private static final int MAX_CAPACITY = 110;
     WaveLoadingView waveLoadingView;
     private DatabaseReference mDatabase;
-    //  툴바, 네비게이션 start
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
-    //  툴바, 네비게이션 end
     private FrameLayout frameLayout;
-    Long familyUsedSum= Long.valueOf(0);
+    Long familyUsedSum = Long.valueOf(0);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,42 +71,40 @@ public class MainActivity extends AppCompatActivity {
         waveLoadingView.setAnimDuration(3000);
         waveLoadingView.setProgressValue(0);
 
-
-
-//툴바, 네비게이션 바 관련 start
+        Intent intent = getIntent();
+        int familyCount = intent.getIntExtra("familyCount", 0);
 
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-//툴바, 네비게이션 바 관련 end
+
         mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
         String key = getIntent().getStringExtra("key");
-
-
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (user != null) {
-            String uid = user.getUid();
+            FirebaseAuth mAuth = FirebaseAuth.getInstance();
+            String uid = mAuth.getCurrentUser().getUid();
             mDatabase.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     Typeface typeface = ResourcesCompat.getFont(MainActivity.this, R.font.cafe24surround);
 
-                    long familyMembersCount = snapshot.child(getUid()).child("family_members").getChildrenCount();
+                    DataSnapshot familyMembersSnapshot = snapshot.child(uid).child("family_members");
+                    long familyMembersCount = familyMembersSnapshot.getChildrenCount();
+
                     long totalCapacity = familyMembersCount * MAX_CAPACITY;
                     long totalUsage = 0;
-//                    frameLayout.removeAllViews();
-                    for (DataSnapshot childSnapshot : snapshot.child(getUid()).child("family_members").getChildren()) {
-                        frameLayout.removeAllViews();
+
+                    frameLayout.removeAllViews();
+                    for (DataSnapshot childSnapshot : familyMembersSnapshot.getChildren()) {
                         String key = childSnapshot.getKey();
                         DataSnapshot data = childSnapshot;
 
@@ -127,45 +120,37 @@ public class MainActivity extends AppCompatActivity {
                             totalUsage += sinkValue;
                         }
 
-
-                        if(sumValue !=null){
+                        if (sumValue != null) {
                             familyUsedSum += sumValue;
                         }
-
                     }
-                    double totalUsageLiters = (double)totalUsage / 1000.0;
-                    double percent = (totalUsageLiters / (double) totalCapacity )* 100;
+
+                    double totalUsageLiters = (double) totalUsage / 1000.0;
+                    double percent = (totalUsageLiters / (double) totalCapacity) * 100;
                     double roundedPercent = Math.round(percent * 10) / 10.0;
-                    int displayPercent = (int) Math.ceil(percent);
+                    int displayPercent = (int)(percent);
                     waveLoadingView.startAnimation();
-                    waveLoadingView.setProgressValue((int) Math.round(percent));
-                    waveLoadingView.setCenterTitle(displayPercent + "%");
+                    waveLoadingView.setProgressValue(displayPercent);
+                    waveLoadingView.setCenterTitle(roundedPercent + "%");
 
-                    // waveLoadingView의 애니메이션 시작 위치 설정
+                    if (roundedPercent > 100.0) {
+                        double excessPercent = roundedPercent - 100.0;
+                        double roundExcessPercent = Math.round(excessPercent * 10) / 10.0;
+                        int displayExcessPercent = (int) roundExcessPercent;
 
-                        //int startAngle = (int) (360 * (percent / 100.0));
+                        int centerTitleStrokeColor = ContextCompat.getColor(MainActivity.this, android.R.color.holo_red_dark);
+                        int centerTitleColor = ContextCompat.getColor(MainActivity.this, android.R.color.white);
+                        waveLoadingView.setCenterTitleStrokeColor(centerTitleStrokeColor);
+                        waveLoadingView.setCenterTitleSize(centerTitleColor);
+                        int redColor = Color.parseColor("#FF6E6E");
+                        waveLoadingView.setWaveColor(redColor);
 
-                        if (roundedPercent > 100.0) {
-                            double excessPercent = roundedPercent - 100.0;
-                            double roundExcessPercent = Math.round(excessPercent*10)/10.0;
-                            int displayExcessPercent = (int)roundExcessPercent;
+                        waveLoadingView.setBorderColor(Color.parseColor("#FF4646"));
 
-                            int centerTitleStrokeColor = ContextCompat.getColor(MainActivity.this, android.R.color.holo_red_dark);
-                            int centerTitleColor = ContextCompat.getColor(MainActivity.this, android.R.color.white);
-                            waveLoadingView.setCenterTitleStrokeColor(centerTitleStrokeColor);
-                            waveLoadingView.setCenterTitleSize(centerTitleColor);
-                            int redColor = Color.parseColor("#FF6E6E"); // #FF6E6E 색상으로 설정
-                            waveLoadingView.setWaveColor(redColor);
-
-                            waveLoadingView.setBorderColor(Color.parseColor("#FF4646"));
-
-                            waveLoadingView.setProgressValue(displayExcessPercent);
-                            waveLoadingView.setCenterTitle(roundExcessPercent + "% 초과");
-                        }
+                        waveLoadingView.setProgressValue(displayExcessPercent);
+                        waveLoadingView.setCenterTitle(roundExcessPercent + "% 초과");
+                    }
                     frameLayout.addView(waveLoadingView);
-
-
-
 
                     ImageView imageView = new ImageView(MainActivity.this);
                     imageView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
@@ -173,15 +158,13 @@ public class MainActivity extends AppCompatActivity {
                     imageView.setScaleType(ImageView.ScaleType.CENTER);
                     FrameLayout.LayoutParams imageLayoutParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
                     imageLayoutParams.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
-                    imageLayoutParams.topMargin = toolbar.getHeight(); // 툴바의 높이만큼 topMargin 설정
+                    imageLayoutParams.topMargin = toolbar.getHeight();
                     imageView.setLayoutParams(imageLayoutParams);
                     frameLayout.addView(imageView);
 
-
-
                     TextView userSumTextView = new TextView(MainActivity.this);
                     userSumTextView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
-                    userSumTextView.setText("우리 가족의 하루 총 사용량 \n"+String.valueOf(totalUsageLiters)+" L");
+                    userSumTextView.setText("우리 가족의 하루 총 사용량 \n" + String.valueOf(totalUsageLiters) + " L");
                     userSumTextView.setTextSize(30);
                     userSumTextView.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER);
                     userSumTextView.setTypeface(typeface, Typeface.BOLD);
@@ -189,7 +172,6 @@ public class MainActivity extends AppCompatActivity {
                     layoutParams.gravity = Gravity.CENTER;
                     userSumTextView.setLayoutParams(layoutParams);
                     frameLayout.addView(userSumTextView);
-
                 }
 
                 @Override
@@ -202,20 +184,16 @@ public class MainActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                // 네비게이션 메뉴 아이템 선택 시 처리할 코드 작성
                 int itemId = item.getItemId();
                 switch (itemId) {
                     case R.id.menu_wateruse:
                         gotoActivity(MainActivity.class);
                         break;
-
                     case R.id.menu_people:
-                        // "구성원" 메뉴 선택 시 처리할 코드 작성
                         gotoActivity(UsedFamily.class);
                         break;
                     case R.id.menu_tips:
                         gotoActivity(TipActivity.class);
-                        // "절약 TIP" 메뉴 선택 시 처리할 코드 작성
                         break;
                     case R.id.check_use:
                         gotoActivity(CheckUse.class);
@@ -228,7 +206,6 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
 
-                // 네비게이션 드로어 닫기
                 DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
                 drawerLayout.closeDrawer(GravityCompat.START);
 
@@ -247,10 +224,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
-    private void gotoActivity(Class c){
-        Intent intent = new Intent(this,c);
+    private void gotoActivity(Class c) {
+        Intent intent = new Intent(this, c);
         intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
@@ -262,5 +237,4 @@ public class MainActivity extends AppCompatActivity {
         }
         return null;
     }
-
 }
