@@ -12,11 +12,7 @@
         android:title="물 사용량"
         android:fontFamily="@font/cafe24surround"
         android:icon="@drawable/waterdrop"/>
-    <item
-        android:id="@+id/menu_detailuse"
-        android:title="세부 사용량"
-        android:fontFamily="@font/cafe24surround"
-        android:icon="@drawable/waterdrop"/>
+
     <item
         android:id="@+id/menu_people"
         android:title="구성원"

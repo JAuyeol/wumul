@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         waveLoadingView = findViewById(R.id.waveLoadingView);
         waveLoadingView.setAnimDuration(3000);
-
+        waveLoadingView.setProgressValue(0);
 
 
 
@@ -111,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
                     long totalUsage = 0;
 //                    frameLayout.removeAllViews();
                     for (DataSnapshot childSnapshot : snapshot.child(getUid()).child("family_members").getChildren()) {
+                        frameLayout.removeAllViews();
                         String key = childSnapshot.getKey();
                         DataSnapshot data = childSnapshot;
 
@@ -119,11 +120,11 @@ public class MainActivity extends AppCompatActivity {
                         Long sumValue = data.child("sum").getValue(Long.class);
 
                         if (showerValue != null) {
-                            totalUsage += showerValue*0.001;
+                            totalUsage += showerValue;
                         }
 
                         if (sinkValue != null) {
-                            totalUsage += sinkValue*0.001;
+                            totalUsage += sinkValue;
                         }
 
 
@@ -132,17 +133,22 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                     }
-                    int percent = (int) ((totalUsage / (double) totalCapacity) * 100);
-                    waveLoadingView.setProgressValue(percent);
-                    waveLoadingView.setCenterTitle(percent+"%");
+                    double totalUsageLiters = (double)totalUsage / 1000.0;
+                    double percent = (totalUsageLiters / (double) totalCapacity )* 100;
+                    double roundedPercent = Math.round(percent * 10) / 10.0;
+                    int displayPercent = (int) Math.ceil(percent);
+                    waveLoadingView.startAnimation();
+                    waveLoadingView.setProgressValue((int) Math.round(percent));
+                    waveLoadingView.setCenterTitle(displayPercent + "%");
 
                     // waveLoadingView의 애니메이션 시작 위치 설정
-                    if (percent >= 1) {
-                        //int startAngle = (int) (360 * (percent / 100.0));
-                        waveLoadingView.startAnimation();
 
-                        if (percent > 100) {
-                            int excessPercent = percent - 100;
+                        //int startAngle = (int) (360 * (percent / 100.0));
+
+                        if (roundedPercent > 100.0) {
+                            double excessPercent = roundedPercent - 100.0;
+                            double roundExcessPercent = Math.round(excessPercent*10)/10.0;
+                            int displayExcessPercent = (int)roundExcessPercent;
 
                             int centerTitleStrokeColor = ContextCompat.getColor(MainActivity.this, android.R.color.holo_red_dark);
                             int centerTitleColor = ContextCompat.getColor(MainActivity.this, android.R.color.white);
@@ -153,11 +159,10 @@ public class MainActivity extends AppCompatActivity {
 
                             waveLoadingView.setBorderColor(Color.parseColor("#FF4646"));
 
-                            waveLoadingView.setCenterTitle("100%");
-                            waveLoadingView.setProgressValue(excessPercent);
-                            waveLoadingView.setCenterTitle(excessPercent + "% 초과");
+                            waveLoadingView.setProgressValue(displayExcessPercent);
+                            waveLoadingView.setCenterTitle(roundExcessPercent + "% 초과");
                         }
-                    }
+                    frameLayout.addView(waveLoadingView);
 
 
 
@@ -176,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
 
                     TextView userSumTextView = new TextView(MainActivity.this);
                     userSumTextView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT));
-                    userSumTextView.setText("우리 가족의 총 사용량 \n"+String.valueOf(familyUsedSum)+" L");
+                    userSumTextView.setText("우리 가족의 하루 총 사용량 \n"+String.valueOf(totalUsageLiters)+" L");
                     userSumTextView.setTextSize(30);
                     userSumTextView.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER);
                     userSumTextView.setTypeface(typeface, Typeface.BOLD);
@@ -186,6 +191,7 @@ public class MainActivity extends AppCompatActivity {
                     frameLayout.addView(userSumTextView);
 
                 }
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
                     // 처리 중 오류가 발생한 경우 여기에서 처리합니다.
@@ -202,9 +208,7 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.menu_wateruse:
                         gotoActivity(MainActivity.class);
                         break;
-                    case R.id.menu_detailuse:
-                        // "세부 사용량" 메뉴 선택 시 처리할 코드 작성
-                        break;
+
                     case R.id.menu_people:
                         // "구성원" 메뉴 선택 시 처리할 코드 작성
                         gotoActivity(UsedFamily.class);

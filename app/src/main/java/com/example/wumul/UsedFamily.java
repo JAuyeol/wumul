@@ -1,5 +1,6 @@
 package com.example.wumul;
 
+import android.app.Person;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -26,11 +27,14 @@ public class UsedFamily extends AppCompatActivity {
 
     private DatabaseReference mDatabase;
     private LinearLayout mFamilyMembersLayout;
+    private Button backCountFamily;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.used_family);
+
+        backCountFamily = findViewById(R.id.back_countFamily_button);
 
         mFamilyMembersLayout = findViewById(R.id.family_use_layout);
         mDatabase = FirebaseDatabase.getInstance().getReference().child("users");
@@ -132,10 +136,21 @@ public class UsedFamily extends AppCompatActivity {
             }
         });
 
+        backCountFamily.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                gotoActivity(CountFamilyActivity.class);
+            }
+        });
+
         return itemLayout;
     }
 
-
+    private void gotoActivity(Class c){
+        Intent intent = new Intent(this,c);
+        intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+    }
 
 
 }
