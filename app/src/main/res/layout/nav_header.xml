@@ -5,7 +5,7 @@
     android:layout_height="175dp"
     android:gravity="bottom"
     android:padding="16dp"
-    android:background="@drawable/logo"
+    android:background="@drawable/waterfamily_resize"
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
     >
 

@@ -198,12 +198,16 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.check_use:
                         gotoActivity(CheckUse.class);
                         break;
+                    case R.id.check_graph:
+                        gotoActivity(GraphActivity.class);
+                        break;
                     case R.id.nav_logout:
                         FirebaseAuth.getInstance().signOut();
                         Toast.makeText(MainActivity.this, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
                         gotoActivity(LoginActivity.class);
                         finish();
                         break;
+
                 }
 
                 DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);

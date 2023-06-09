@@ -25,10 +25,19 @@
         android:fontFamily="@font/cafe24surround"
         android:icon="@drawable/waterdrop"/>
 
-
         <item
             android:id="@+id/check_use"
             android:title="사용량 체크"
+            android:fontFamily="@font/cafe24surround"
+            android:icon="@drawable/waterdrop"/>
+        <item
+            android:id="@+id/check_graph"
+            android:title="월간 그래프"
+            android:fontFamily="@font/cafe24surround"
+            android:icon="@drawable/waterdrop"/>
+        <item
+            android:id="@+id/show_badge"
+            android:title="획득 뱃지"
             android:fontFamily="@font/cafe24surround"
             android:icon="@drawable/waterdrop"/>
 
