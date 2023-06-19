@@ -201,6 +201,9 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.check_graph:
                         gotoActivity(GraphActivity.class);
                         break;
+                    case R.id.show_badge:
+                        gotoActivity(BadgeActivity.class);
+                        break;
                     case R.id.nav_logout:
                         FirebaseAuth.getInstance().signOut();
                         Toast.makeText(MainActivity.this, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
