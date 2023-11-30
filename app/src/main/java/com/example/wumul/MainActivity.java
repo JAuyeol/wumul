@@ -14,8 +14,10 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -47,6 +49,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 import me.itangqi.waveloadingview.WaveLoadingView;
 
@@ -61,6 +66,9 @@ public class MainActivity extends AppCompatActivity {
     private FrameLayout frameLayout;
     Long familyUsedSum = Long.valueOf(0);
 
+    String currentDate = getCurrentDate();
+    String monthDay = currentDate.substring(5); // 연도를 제외하고 월, 일만을 가져옵니다.
+    String[] dateParts = monthDay.split("-");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                     frameLayout.removeAllViews();
                     for (DataSnapshot childSnapshot : familyMembersSnapshot.getChildren()) {
                         String key = childSnapshot.getKey();
-                        DataSnapshot data = childSnapshot;
+                        DataSnapshot data = childSnapshot.child("monthly_usage").child(dateParts[0]).child(dateParts[1]);  // 수정된 부분
 
                         Long showerValue = data.child("shower").getValue(Long.class);
                         Long sinkValue = data.child("sink").getValue(Long.class);
@@ -204,6 +212,9 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.show_badge:
                         gotoActivity(BadgeActivity.class);
                         break;
+                    case R.id.show_reward:
+                        gotoActivity(RewardActivity.class);
+                        break;
                     case R.id.nav_logout:
                         FirebaseAuth.getInstance().signOut();
                         Toast.makeText(MainActivity.this, "로그아웃 되었습니다.", Toast.LENGTH_SHORT).show();
@@ -215,8 +226,11 @@ public class MainActivity extends AppCompatActivity {
 
                 DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
                 drawerLayout.closeDrawer(GravityCompat.START);
+                updateRewardPointIfDayChanged();
 
                 return true;
+
+
             }
         });
 
@@ -244,4 +258,66 @@ public class MainActivity extends AppCompatActivity {
         }
         return null;
     }
+    private String getCurrentDate() {
+        Date currentDate = Calendar.getInstance().getTime();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.format(currentDate);
+    }
+    private void updateRewardPointIfDayChanged() {
+        // SharedPreferences를 사용하여 마지막으로 업데이트한 날짜 저장
+        SharedPreferences sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
+        String lastUpdateDate = sharedPreferences.getString("lastUpdateDate", "");
+
+        // 현재 날짜 가져오기
+        String currentDate = getCurrentDate();
+
+        // 마지막 업데이트 날짜와 현재 날짜 비교
+        if (!lastUpdateDate.equals(currentDate)) {
+            // 하루가 지났으므로 업데이트 수행
+            updateRewardPoints();
+
+            // 업데이트한 날짜 저장
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("lastUpdateDate", currentDate);
+            editor.apply();
+        }
+    }
+
+    private void updateRewardPoints() {
+        // reward_point 업데이트 로직 추가
+
+        // Firebase Realtime Database에서 사용량 데이터 가져오기
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String uid = user.getUid();
+            DatabaseReference userNode = mDatabase.child(uid);
+            DatabaseReference rewardPointNode = userNode.child("reward_point");
+
+            // 여기에서 사용량 데이터를 가져와 reward_point를 계산하고 Firebase에 업데이트합니다.
+            // 사용량 데이터를 가지고 reward_point를 계산하고 Firebase에 업데이트합니다.
+
+            // 예시: 사용량 데이터에서 reward_point 계산
+            int calculatedRewardPoint = calculateRewardPoints();
+
+            // Firebase에 reward_point 업데이트
+            rewardPointNode.setValue(calculatedRewardPoint);
+            Toast.makeText(this, "Reward Point가 업데이트되었습니다. 새로운 Reward Point: " + calculatedRewardPoint, Toast.LENGTH_SHORT).show();
+
+            // 계산된 reward_point 값을 사용하여 필요한 작업을 수행
+
+        }
+    }
+
+    // reward_point 계산 로직
+    private int calculateRewardPoints() {
+        // 사용량 데이터를 기반으로 reward_point를 계산
+        // 필요한 계산 로직을 추가합니다.
+
+        int rewardPoints = 0;
+
+        // 사용량 데이터를 이용하여 rewardPoints 계산
+
+        return rewardPoints;
+    }
+
 }

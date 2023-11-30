@@ -17,11 +17,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 public class UserInfoActivity extends AppCompatActivity {
 
     private DatabaseReference mDatabase;
     private LinearLayout parentLayout;
-
+    String currentDate = getCurrentDate();
+    String monthDay = currentDate.substring(5);
+    String[] dateParts = monthDay.split("-");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,8 +45,8 @@ public class UserInfoActivity extends AppCompatActivity {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.exists()) {
-                        Long sinkValue = dataSnapshot.child("sink").getValue(Long.class);
-                        Long showerValue = dataSnapshot.child("shower").getValue(Long.class);
+                        Long sinkValue = dataSnapshot.child("monthly_usage").child(dateParts[0]).child(dateParts[1]).child("sink").getValue(Long.class);
+                        Long showerValue = dataSnapshot.child("monthly_usage").child(dateParts[0]).child(dateParts[1]).child("shower").getValue(Long.class);
 
                         if (sinkValue == null || showerValue == null) {
                             // sinkValue 또는 showerValue가 null인 경우 처리할 내용
@@ -55,7 +61,7 @@ public class UserInfoActivity extends AppCompatActivity {
                         if (sumValueInLiters >= 10) {
                             formattedValue = String.format("%4.1f", sumValueInLiters);  // 소수점 한 자리까지 포맷팅
                         } else {
-                            formattedValue = String.format("%4.3f", sumValueInLiters);  // 소수점 세 자리까지 포맷팅
+                            formattedValue = String.format("%4.2f", sumValueInLiters);  // 소수점 세 자리까지 포맷팅
                         }
 
                         Typeface typeface = ResourcesCompat.getFont(UserInfoActivity.this, R.font.cafe24surround);
@@ -95,8 +101,6 @@ public class UserInfoActivity extends AppCompatActivity {
                         usedWashstandTextView.setTypeface(typeface);
                         parentLayout.addView(usedWashstandTextView);
 
-
-
                         TextView usedTotalTextView = new TextView(UserInfoActivity.this);
                         LinearLayout.LayoutParams usedTotalTextViewParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                         usedTotalTextViewParams.setMargins(50, 50, 150, 0);
@@ -119,5 +123,11 @@ public class UserInfoActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private String getCurrentDate() {
+        Date currentDate = Calendar.getInstance().getTime();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.format(currentDate);
     }
 }

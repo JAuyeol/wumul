@@ -30,6 +30,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 public class CheckUse extends AppCompatActivity {
@@ -46,6 +49,9 @@ public class CheckUse extends AppCompatActivity {
     private static String CHANEL_NAME = "Channel1";
     private NotificationManager manager;
     private NotificationCompat.Builder builder;
+    String currentDate = getCurrentDate();
+    String monthDay = currentDate.substring(5); // 연도를 제외하고 월, 일만을 가져옵니다.
+    String[] dateParts = monthDay.split("-");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +72,10 @@ public class CheckUse extends AppCompatActivity {
         DB_SINK = database.getReference("sink");
         DB_HEAD = database.getReference("head");
         DB_FLAG = database.getReference("flag");
+//        String currentDate = getCurrentDate();
+//        String monthDay = currentDate.substring(5); // 연도를 제외하고 월, 일만을 가져옵니다.
+//        String[] dateParts = monthDay.split("-");
+
 
         btn_start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,36 +142,45 @@ public class CheckUse extends AppCompatActivity {
                 // 레이아웃 초기화
                 mFamilyMembersLayout.removeAllViews();
 
+                // 현재 날짜를 가져옵니다.
+                if (dateParts.length == 2) {
+                    String month = dateParts[0];
+                    String day = dateParts[1];
+                }
                 // Firebase에서 데이터 읽어와서 동적으로 레이아웃 추가
-                for (DataSnapshot childSnapshot : snapshot.child(getUid()).child("family_members").getChildren()) {
-                    String key = childSnapshot.getKey();
-                    DataSnapshot data = childSnapshot;
+                    for (DataSnapshot childSnapshot : snapshot.child(uid).child("family_members").getChildren()) {
+                        String userName = childSnapshot.getKey(); // 사용자가 입력한 이름
+                        DataSnapshot userSnapshot = childSnapshot; // 현재 월
 
-                    Long sinkValue = data.child("sink").getValue(Long.class);
-                    Long showerValue = data.child("shower").getValue(Long.class);
+                        for (DataSnapshot data : userSnapshot.getChildren()) {
+                            String key = data.getKey();
 
-                    if (sinkValue != null && showerValue != null) {
-                        Long sumValue = sinkValue + showerValue;  // sumValue 계산
+                            Long sinkValue = data.child(dateParts[0]).child(dateParts[1]).child("sink").getValue(Long.class);
+                            Long showerValue = data.child(dateParts[0]).child(dateParts[1]).child("shower").getValue(Long.class);
 
-                        String sinkStrValue = String.valueOf(sinkValue);
-                        String showerStrValue = String.valueOf(showerValue);
-                        String sumStrValue = String.valueOf(sumValue);
+                            if (sinkValue != null && showerValue != null) {
+                                Long sumValue = sinkValue + showerValue;  // sumValue 계산
 
-                        // 레이아웃 생성
-                        LinearLayout itemLayout = createItemLayout(key, sinkStrValue, showerStrValue, sumStrValue);
-                        mFamilyMembersLayout.addView(itemLayout);
+                                String sinkStrValue = String.valueOf(sinkValue);
+                                String showerStrValue = String.valueOf(showerValue);
+                                String sumStrValue = String.valueOf(sumValue);
 
-                        // sinkValue와 showerValue를 업데이트
-                        if (key.equals("sink")) {
-                            get_sink = sinkValue.intValue();
-                            tv_sink.setText(sinkStrValue);
-                        } else if (key.equals("shower")) {
-                            get_head = showerValue.intValue();
-                            tv_head.setText(showerStrValue);
+                                // 레이아웃 생성
+                                LinearLayout itemLayout = createItemLayout(userName, sinkStrValue, showerStrValue, sumStrValue);
+                                mFamilyMembersLayout.addView(itemLayout);
+
+                                // sinkValue와 showerValue를 업데이트
+                                if (key.equals("sink")) {
+                                    get_sink = sinkValue.intValue();
+                                    tv_sink.setText(sinkStrValue);
+                                } else if (key.equals("shower")) {
+                                    get_head = showerValue.intValue();
+                                    tv_head.setText(showerStrValue);
+                                }
+                            }
                         }
                     }
                 }
-            }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
@@ -220,13 +239,15 @@ public class CheckUse extends AppCompatActivity {
         showerText.setTypeface(typeface);
         sumText.setTypeface(typeface);
 
-        // sinkValue와 showerValue를 업데이트
+
         Long sinkValueLong = Long.parseLong(sinkValue);  // sinkValueLong 변수 초기화
         Long showerValueLong = Long.parseLong(showerValue);
-
+        // saveButton 클릭 이벤트 처리
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.d("SaveButton", "Save button clicked");
+
                 String updatedSinkValue = tv_sink.getText().toString();
                 String updatedShowerValue = tv_head.getText().toString();
 
@@ -237,15 +258,64 @@ public class CheckUse extends AppCompatActivity {
                 Long sinkValueLongUpdated = updatedSinkValueLong + sinkValueLong;
                 Long showerValueLongUpdated = updatedShowerValueLong + showerValueLong;
 
-                mDatabase.child(getUid()).child("family_members").child(key).child("sink").setValue(sinkValueLongUpdated);
-                mDatabase.child(getUid()).child("family_members").child(key).child("shower").setValue(showerValueLongUpdated);
-                mDatabase.child(getUid()).child("family_members").child(key).child("sum").setValue(sinkValueLongUpdated + showerValueLongUpdated);
+                // 월간 사용량 업데이트
+                mDatabase.child(getUid())
+                        .child("family_members")
+                        .child(key)
+                        .child("monthly_usage")
+                        .child(dateParts[0])
+                        .child("month_sink")
+                        .setValue(sinkValueLongUpdated);
 
+                mDatabase.child(getUid())
+                        .child("family_members")
+                        .child(key)
+                        .child("monthly_usage")
+                        .child(dateParts[0])
+                        .child("month_shower")
+                        .setValue(showerValueLongUpdated);
+
+                mDatabase.child(getUid())
+                        .child("family_members")
+                        .child(key)
+                        .child("monthly_usage")
+                        .child(dateParts[0])
+                        .child("month_sum")
+                        .setValue(sinkValueLongUpdated + showerValueLongUpdated);
+
+                // 일간 사용량 업데이트
+                mDatabase.child(getUid())
+                        .child("family_members")
+                        .child(key)
+                        .child("monthly_usage")
+                        .child(dateParts[0])
+                        .child(dateParts[1])
+                        .child("sink")
+                        .setValue(sinkValueLongUpdated);
+
+                mDatabase.child(getUid())
+                        .child("family_members")
+                        .child(key)
+                        .child("monthly_usage")
+                        .child(dateParts[0])
+                        .child(dateParts[1])
+                        .child("shower")
+                        .setValue(showerValueLongUpdated);
+
+                mDatabase.child(getUid())
+                        .child("family_members")
+                        .child(key)
+                        .child("monthly_usage")
+                        .child(dateParts[0])
+                        .child(dateParts[1])
+                        .child("sum")
+                        .setValue(sinkValueLongUpdated + showerValueLongUpdated);
+
+                // 초기화
                 DB_HEAD.setValue(0);
                 DB_SINK.setValue(0);
             }
         });
-
 
 
         itemLayout.addView(saveButton);
@@ -284,10 +354,17 @@ public class CheckUse extends AppCompatActivity {
         Notification notification = builder.build();
         manager.notify(1, notification);
     }
+
     private void gotoActivity(Class c){
         Intent intent = new Intent(this,c);
-        intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
 
+    // 현재 날짜를 가져오는 메소드
+    private String getCurrentDate() {
+        Date currentDate = Calendar.getInstance().getTime();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.format(currentDate);
+    }
 }

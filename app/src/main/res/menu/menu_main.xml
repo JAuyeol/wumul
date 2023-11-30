@@ -35,9 +35,16 @@
             android:title="월간 그래프"
             android:fontFamily="@font/cafe24surround"
             android:icon="@drawable/waterdrop"/>
+
+        <item
+            android:id="@+id/show_reward"
+            android:title="포인트"
+            android:fontFamily="@font/cafe24surround"
+            android:icon="@drawable/waterdrop"/>
+
         <item
             android:id="@+id/show_badge"
-            android:title="획득 뱃지"
+            android:title="획득 뱃지 (구현 예정)"
             android:fontFamily="@font/cafe24surround"
             android:icon="@drawable/waterdrop"/>
 

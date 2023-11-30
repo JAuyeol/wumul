@@ -23,12 +23,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 public class UsedFamily extends AppCompatActivity {
 
     private DatabaseReference mDatabase;
     private LinearLayout mFamilyMembersLayout;
     private Button backCountFamily;
-
+    String currentDate = getCurrentDate();
+    String monthDay = currentDate.substring(5);
+    String[] dateParts = monthDay.split("-");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,7 +81,7 @@ public class UsedFamily extends AppCompatActivity {
         return null;
     }
 
-    private LinearLayout createItemLayout(String key, DataSnapshot dataSnapshot) {
+    private LinearLayout createItemLayout(String key, DataSnapshot familyMemberSnapshot) {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -89,40 +95,33 @@ public class UsedFamily extends AppCompatActivity {
         familyButton.setLayoutParams(layoutParams);
         familyButton.setBackgroundResource(R.drawable.button3_pattern);
         familyButton.setTextColor(getResources().getColor(R.color.white));
-        familyButton.setTextSize(getResources().getDimension(R.dimen.button_text_size_small)); // 작은 텍스트 크기 설정
+        familyButton.setTextSize(getResources().getDimension(R.dimen.button_text_size_small));
         Typeface typeface = ResourcesCompat.getFont(this, R.font.cafe24surround);
         familyButton.setTypeface(typeface);
 
         // Firebase에서 데이터 가져오기
-        DataSnapshot sinkSnapshot = dataSnapshot.child("sink");
-        DataSnapshot showerSnapshot = dataSnapshot.child("shower");
-        if (sinkSnapshot.exists() && showerSnapshot.exists()) {
-            Long sinkValue = sinkSnapshot.getValue(Long.class);
-            Long showerValue = showerSnapshot.getValue(Long.class);
-            if (sinkValue != null && showerValue != null) {
-                Long sumValue = sinkValue + showerValue;
+        DataSnapshot monthlyUsageSnapshot = familyMemberSnapshot.child("monthly_usage").child(dateParts[0]).child(dateParts[1]);
 
-                // 버튼 텍스트 설정
-                String buttonText;
-                if (sumValue < 1000) {
-                    buttonText = key + "\n총 사용량: " + sumValue + " mL";
-                } else {
-                    double sumValueInLiters = (double) sumValue / 1000.0;  // mL을 L로 변환
-                    String formattedValue;
-                    if (sumValueInLiters >= 10) {
-                        formattedValue = String.format("%4.1f", sumValueInLiters);  // 소수점 한 자리까지 포맷팅
-                    } else {
-                        formattedValue = String.format("%4.3f", sumValueInLiters);  // 소수점 세 자리까지 포맷팅
-                    }
-                    buttonText = key + "\n총 사용량: " + formattedValue + " L";
-                }
+        long showerValue = getValueFromSnapshot(monthlyUsageSnapshot.child("shower"));
+        long sinkValue = getValueFromSnapshot(monthlyUsageSnapshot.child("sink"));
+        long sumValue = getValueFromSnapshot(monthlyUsageSnapshot.child("sum"));
 
-                familyButton.setText(buttonText);
-            }
+        // 버튼 텍스트 설정
+        String buttonText;
+        if (sumValue < 1000) {
+            buttonText = key + "\n총 사용량: " + sumValue + " mL";
         } else {
-            // 데이터가 없는 경우 처리
-            familyButton.setText(key);
+            double sumValueInLiters = (double) sumValue / 1000.0;  // mL을 L로 변환
+            String formattedValue;
+            if (sumValueInLiters >= 10) {
+                formattedValue = String.format("%4.1f", sumValueInLiters);  // 소수점 한 자리까지 포맷팅
+            } else {
+                formattedValue = String.format("%4.2f", sumValueInLiters);  // 소수점 세 자리까지 포맷팅
+            }
+            buttonText = key + "\n일간 총 사용량: " + formattedValue + " L";
         }
+
+        familyButton.setText(buttonText);
 
         itemLayout.addView(familyButton);
 
@@ -150,6 +149,19 @@ public class UsedFamily extends AppCompatActivity {
         Intent intent = new Intent(this,c);
         intent.addFlags(intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
+    }
+
+    private String getCurrentDate() {
+        Date currentDate = Calendar.getInstance().getTime();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        return dateFormat.format(currentDate);
+    }
+    private long getValueFromSnapshot(DataSnapshot snapshot) {
+        if (snapshot.exists()) {
+            return snapshot.getValue(Long.class);
+        } else {
+            return 0;
+        }
     }
 
 
